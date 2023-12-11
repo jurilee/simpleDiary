@@ -1,7 +1,6 @@
 import { useState, useRef } from "react";
 
 const DiaryEditor = ({onCreate}) => {
-
     const authorInput = useRef();
     const contentInput = useRef();
 
@@ -17,7 +16,6 @@ const [state, setState] = useState({
 const handleChangeState = (e) => {
     // console.log(e.target.name);
     // console.log(e.target.value);
-
     setState({
     ...state,
     [e.target.name]: e.target.value,
@@ -78,8 +76,7 @@ return (
         <select
           name="emotion"
           value={state.emotion}
-          onChange={handleChangeState}
-        >
+          onChange={handleChangeState}>
           <option value={1}>1</option>
           <option value={2}>2</option>
           <option value={3}>3</option>

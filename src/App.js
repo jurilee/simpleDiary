@@ -1,36 +1,32 @@
-import { useState, useRef } from 'react';
-import './App.css';
-import DiaryEditor from './DiaryEditor';
-import DiaryList from './DiaryList';
-
-// const dummyList = [
-//   {
-//     id: 1,
-//     author: "이주리",
-//     content: "안녕하세용",
-//     emotion: 5,
-//     created_date: new Date().getTime(),
-//   },
-//   {
-//     id: 2,
-//     author: "유지성",
-//     content: "반갑습니다",
-//     emotion: 4,
-//     created_date: new Date().getTime(),
-//   },
-//   {
-//     id: 3,
-//     author: "손정민",
-//     content: "안녕히가세용",
-//     emotion: 3,
-//     created_date: new Date().getTime(),
-//   }
-// ];
+import { useEffect, useRef, useState } from "react";
+import "./App.css";
+import DiaryEditor from "./DiaryEditor";
+import DiaryList from "./DiaryList";
+// import Lifecycle from "./Lifecycle";
+//https://jsonplaceholder.typicode.com/comments
 
 function App() {
-
-  const [data, setDate] = useState([]);
+  const [data, setData] = useState([]);
   const dataId = useRef(0);
+  const getData = async () => {
+    const res = await fetch("https://jsonplaceholder.typicode.com/comments")
+      .then((res) => res.json());
+    // console.log(res)
+    const initData = res.slice(0, 20).map((it) => {
+      return {
+        author: it.email,
+        content: it.body,
+        emotion: Math.floor(Math.random() * 5) + 1,
+        create_date: new Date().getTime(),
+        id:dataId.current++
+      }
+    });
+    setData(initData);
+  };
+
+  useEffect(() => {
+    getData();
+  },[])
 
   const onCreate = (author, content, emotion) => {
     const created_date = new Date().getTime();
@@ -39,16 +35,31 @@ function App() {
       content,
       emotion,
       created_date,
-      id: dataId.current
+      id: dataId.current,
     };
+
     dataId.current += 1;
-    setDate([newItem, ...data]);
-  }
+
+    setData([newItem, ...data]);
+  };
+
+  const onRemove = (targetId) => {
+    const newDiaryList = data.filter((it) => it.id !== targetId);
+    // console.log(newDiaryList);
+    setData(newDiaryList);
+  };
+      const onEdit = (targetId, newContent) => {
+        setData(
+            data.map((i) =>
+                i.id === targetId ? { ...i, content: newContent } : i)
+        )
+    }
 
   return (
     <div className="App">
+      {/* <Lifecycle /> */}
       <DiaryEditor onCreate={onCreate} />
-      <DiaryList diaryList={data} /> 
+      <DiaryList diaryList={data} onRemove={onRemove} onEdit={onEdit} />
     </div>
   );
 }
